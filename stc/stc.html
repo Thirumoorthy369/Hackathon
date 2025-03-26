@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intrusion Detection System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #1e1e1e;
+            padding: 25px;
+            box-shadow: 0px 4px 20px rgba(0, 255, 170, 0.2);
+            border-radius: 12px;
+        }
+        h1 {
+            color: #00ffab;
+            text-shadow: 0px 0px 8px rgba(0, 255, 170, 0.8);
+        }
+        .alerts, .logs {
+            text-align: left;
+            margin-top: 20px;
+        }
+        .alert {
+            background: linear-gradient(135deg, #ff4e50, #f9d423);
+            color: white;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 6px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .log {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .icon {
+            font-size: 18px;
+        }
+        #alert-box, #log-box {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        button {
+            background-color: #00ffab;
+            color: #121212;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 6px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #00cc88;
+        }
+        #attack-count {
+            font-size: 18px;
+            font-weight: bold;
+            color: #f9d423;
+            margin-top: 10px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Intrusion Detection System</h1>
+        <div class="buttons">
+            <button onclick="simulateAttack()">⚡ Simulate Attack</button>
+            <button onclick="downloadLogs()">📥 Download Logs</button>
+            <button onclick="clearAll()">🗑️ Clear Logs & Alerts</button>
+        </div>
+        <div id="attack-count">Total Attacks Detected: 0</div>
+        <div class="alerts">
+            <h2>🚨 Real-Time Alerts</h2>
+            <div id="alert-box"></div>
+        </div>
+        <div class="logs">
+            <h2>📜 System Logs</h2>
+            <div id="log-box"></div>
+        </div>
+    </div>
+
+    <script>
+        let attackCounter = 0;
+
+        function getTimeStamp() {
+            return new Date().toLocaleTimeString();
+        }
+
+        function playAlertSound() {
+            const alertSound = new Audio('https://www.soundjay.com/button/beep-07.wav');
+            alertSound.play();
+        }
+
+        function updateAttackCounter() {
+            attackCounter++;
+            document.getElementById("attack-count").innerText = `Total Attacks Detected: ${attackCounter}`;
+        }
+
+        function addAlert(message) {
+            const alertBox = document.getElementById("alert-box");
+            const alertDiv = document.createElement("div");
+            alertDiv.className = "alert";
+            alertDiv.innerHTML = `<i class="fas fa-exclamation-triangle icon"></i> ${getTimeStamp()} - ${message}`;
+            alertBox.prepend(alertDiv);
+            playAlertSound();
+            updateAttackCounter();
+            setTimeout(() => alertDiv.remove(), 6000);
+        }
+
+        function addLog(message) {
+            const logBox = document.getElementById("log-box");
+            const logDiv = document.createElement("div");
+            logDiv.className = "log";
+            logDiv.innerHTML = `<i class="fas fa-terminal icon"></i> ${getTimeStamp()} - ${message}`;
+            logBox.prepend(logDiv);
+        }
+
+        function simulateAttack() {
+            const fakeIPs = ["192.168.1.1", "203.0.113.45", "10.0.0.5", "172.16.0.22"];
+            const messages = [
+                "Unauthorized access attempt detected on port 22!",
+                "Multiple failed SSH login attempts detected!",
+                "Brute-force attack attempt on user 'admin'.",
+                "Suspicious login activity detected from unknown IP."
+            ];
+            let randomIP = fakeIPs[Math.floor(Math.random() * fakeIPs.length)];
+            let randomMsg = messages[Math.floor(Math.random() * messages.length)];
+            
+            addAlert(`🚨 ${randomMsg} (IP: ${randomIP})`);
+            addLog(`🛑 ${randomIP} - ${randomMsg}`);
+        }
+
+        function downloadLogs() {
+            const logs = document.getElementById("log-box").innerText;
+            const blob = new Blob([logs], { type: "text/plain" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "intrusion_logs.txt";
+            link.click();
+        }
+
+        function clearAll() {
+            document.getElementById("alert-box").innerHTML = "";
+            document.getElementById("log-box").innerHTML = "";
+            attackCounter = 0;
+            updateAttackCounter();
+        }
+
+        function generateFakeIntrusions() {
+            setInterval(() => {
+                simulateAttack();
+            }, 5000); // New event every 5 seconds
+        }
+
+        generateFakeIntrusions(); // Start the fake IDS
+    </script>
+</body>
+</html>
